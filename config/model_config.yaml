@@ -1,0 +1,99 @@
+# Configuration du Modèle RL
+
+# Algorithme d'apprentissage
+rl:
+  algorithm: "PPO"  # Options: PPO, DQN, A2C, DDPG
+  policy: "MlpPolicy"
+  learning_rate: 3e-4
+  n_steps: 2048
+  batch_size: 64
+  n_epochs: 10
+  gamma: 0.99
+  gae_lambda: 0.95
+  clip_range: 0.2
+  ent_coef: 0.01
+  vf_coef: 0.5
+  max_grad_norm: 0.5
+  target_kl: null
+  verbose: 1
+
+# Environnement
+environment:
+  frame_skip: 4
+  action_repeat: 1
+  max_episode_steps: 5000
+  observation_size: [84, 84]
+  stack_frames: 4
+
+# État (Observation Space)
+state:
+  include_velocity: true
+  include_acceleration: true
+  include_rpm: true
+  include_gear: true
+  include_steering_angle: true
+  include_radar: true
+  radar_range: 100.0  # mètres
+  radar_points: 8
+  include_camera: true
+  camera_resolution: [640, 480]
+
+# Actions
+actions:
+  throttle_range: [0.0, 1.0]
+  brake_range: [0.0, 1.0]
+  steering_range: [-1.0, 1.0]
+  steering_sensitivity: 1.0
+  clutch_range: [0.0, 1.0]
+  gear_actions: [-1, 0, 1]  # -1=down, 0=neutral, 1=up
+
+# Fonction de Récompense
+reward:
+  speed_weight: 0.5           # Bonus pour vitesse
+  smoothness_weight: 0.2      # Bonus pour conduite lisse
+  track_alignment_weight: 0.3 # Bonus pour rester sur piste
+  collision_penalty: -50.0
+  out_of_track_penalty: -5.0
+  smooth_steering_penalty: -0.1
+  speed_loss_penalty: -0.1
+  max_speed_factor: 300.0     # km/h
+
+# Circuit
+circuit:
+  name: "imola"
+  track_width: 15.0  # mètres
+  optimal_speed: 200.0  # km/h
+  allow_reverse: false
+
+# Entraînement
+training:
+  total_timesteps: 1000000
+  save_frequency: 10000
+  eval_frequency: 50000
+  eval_episodes: 5
+  test_frequency: 100000
+  render: false
+  render_frequency: 1000
+
+# Réseau de Neurones
+network:
+  policy_layers: [256, 256, 256]
+  value_layers: [256, 256, 256]
+  activation_fn: "relu"
+  use_sde: false
+  sde_sample_freq: -1
+
+# Checkpoint & Sauvegarde
+saving:
+  model_dir: "models/trained_models"
+  log_dir: "logs"
+  save_best: true
+  save_last: true
+  best_model_save_path: "models/best_model"
+
+# Débogage
+debug:
+  log_level: "INFO"
+  save_trajectories: true
+  record_video: false
+  plot_learning_curves: true
